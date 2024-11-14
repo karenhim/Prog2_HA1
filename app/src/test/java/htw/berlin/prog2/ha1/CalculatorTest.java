@@ -90,5 +90,21 @@ class CalculatorTest {
 
 
     //TODO hier weitere Tests erstellen
+
+    //Teilaufgabe 1
+    @Test
+    @DisplayName("Should display result after subtracting 2 single digit numbers")
+    public void testBasicSubtraction(){
+        Calculator calc = new Calculator();
+        calc.pressDigitKey(9);
+        calc.pressBinaryOperationKey("-");
+        calc.pressDigitKey(3);
+        calc.pressEqualsKey();
+
+        String expected = "6";
+        String actual=calc.readScreen();
+
+        assertEquals(expected, actual);
+    }
 }
 
