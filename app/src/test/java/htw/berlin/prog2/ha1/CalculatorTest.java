@@ -106,5 +106,52 @@ class CalculatorTest {
 
         assertEquals(expected, actual);
     }
+
+    //Teilaufgabe 2.1
+    @Test
+    @DisplayName("Should display error when calculating inverse of 0")
+    public void testInverseZero(){
+        Calculator calc=new Calculator();
+        calc.pressDigitKey(0);
+        calc.pressUnaryOperationKey("1/x");
+
+        String actual = calc.readScreen();
+
+        String expected="Error";
+
+        assertEquals(expected,actual);
+    }
+    //Teilaufgabe 2.2
+    @Test
+    @DisplayName("Should correctly handle new input after binary operations")
+    void testWeirdFunctinalityOfPressDigitKey(){
+        Calculator calc=new Calculator();
+        calc.pressDigitKey(5);
+        calc.pressBinaryOperationKey("+");
+        calc.pressDigitKey(5);
+        calc.pressDigitKey(3);
+
+        String expected="53";
+        String actual=calc.readScreen();
+
+        assertEquals(expected,actual);
+    }
+
+    //Teilaufgabe 2.3
+    @Test
+    @DisplayName("Should correctly handle negative operands in binary operations")
+    public void testAdditionOfnegatives(){
+        Calculator calc = new Calculator();
+        calc.pressDigitKey(5);
+        calc.pressBinaryOperationKey("+");
+        calc.pressNegativeKey();
+        calc.pressDigitKey(3);
+        calc.pressEqualsKey();
+
+        String expected="2";
+        String actual = calc.readScreen();
+
+        assertEquals(expected, actual);
+    }
 }
 
