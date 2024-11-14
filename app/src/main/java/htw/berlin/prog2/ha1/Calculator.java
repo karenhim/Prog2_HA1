@@ -13,6 +13,7 @@ public class Calculator {
     private double latestValue;
 
     private String latestOperation = "";
+    private boolean isNewInput = false; //Teilaufgabe 3.2
 
     /**
      * @return den aktuellen Bildschirminhalt als String
@@ -31,7 +32,21 @@ public class Calculator {
     public void pressDigitKey(int digit) {
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
 
-        if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
+        // Teilaufgabe 3.2
+        /**
+         * Bug fix: Handling New Input After Binary Operations
+         * - Introduced a boolean flag isNewInput to determine when to clear the screen
+         *   for a new number after a binary operation.
+         * - This change ensures that when a user presses a binary operation key, the next
+         *   digit entry starts a new number on the screen instead of appending to the previous one.
+         */
+
+
+        if (isNewInput || screen.equals("0")) {
+            screen = "";
+            isNewInput = false; // Reset flag after starting new input
+        }
+        //if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
 
         screen = screen + digit;
     }
@@ -62,6 +77,10 @@ public class Calculator {
     public void pressBinaryOperationKey(String operation)  {
         latestValue = Double.parseDouble(screen);
         latestOperation = operation;
+
+        //Teilaufgabe 3.2
+        isNewInput = true;
+
     }
 
     /**
@@ -74,12 +93,29 @@ public class Calculator {
     public void pressUnaryOperationKey(String operation) {
         latestValue = Double.parseDouble(screen);
         latestOperation = operation;
+
+        //Teilaufgabe 3.1
+        /**
+         * Bug Fix: Handling inversion of 0
+         * If the inverse operation (1/x) is performed with zero as the input,
+         * the screen will display "Error" instead of "Infinity" to indicate
+         * that division by zero is undefined. This prevents "Infinity" from being
+         * displayed and ensures a clear error message for invalid operations.
+         */
+
+        if (Double.parseDouble(screen) == 0 || operation.equals("1/x")){
+            screen = "Error";
+            return;
+        }
+
         var result = switch(operation) {
             case "√" -> Math.sqrt(Double.parseDouble(screen));
             case "%" -> Double.parseDouble(screen) / 100;
             case "1/x" -> 1 / Double.parseDouble(screen);
             default -> throw new IllegalArgumentException();
         };
+
+
         screen = Double.toString(result);
         if(screen.equals("NaN")) screen = "Error";
         if(screen.contains(".") && screen.length() > 11) screen = screen.substring(0, 10);
@@ -105,7 +141,27 @@ public class Calculator {
      * entfernt und der Inhalt fortan als positiv interpretiert.
      */
     public void pressNegativeKey() {
-        screen = screen.startsWith("-") ? screen.substring(1) : "-" + screen;
+
+        //Teilaufgabe 3.3
+         /**
+         * Bug fix: Handling Negative Operands in Binary Operations
+         * - When called after a binary operation (e.g., "+"), this method clears the screen and
+         *   starts a new input sequence with a negative sign.
+         * - Sets the screen to "-" if it is the start of a new input, allowing the next digit entry
+         *   to represent a negative number.
+         * - Resets isNewInput to false after setting the negative sign, ensuring that further
+         *   digit entries will append to the current screen display.
+        */
+        if (screen.equals("0") || isNewInput) {
+            screen = "-"; // Start with the negative sign for the next input
+            isNewInput = false; // Reset to allow input continuation
+        } else if (screen.startsWith("-")) {
+            screen = screen.substring(1); // Remove the negative sign if it's already present
+        } else {
+            screen = "-" + screen; // Add the negative sign if not present
+        }
+
+        //screen = screen.startsWith("-") ? screen.substring(1) : "-" + screen;
     }
 
     /**
